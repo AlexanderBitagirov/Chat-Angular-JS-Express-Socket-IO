@@ -1,0 +1,41 @@
+<md-content>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2 flex="">Chat</h2>
+            <md-button aria-label="Open demo menu" ng-click="123">Exit</md-button>
+        </div>
+    </md-toolbar>
+</md-content>
+<div flex="" layout="row">
+    <div flex="40">
+        <md-list>
+            <md-list-item class="md-3-line" ng-repeat="item in onlineUser" ng-if="item.name !== user"
+                ng-click="receiveIdUser(item.id , item.name)">
+                <h4>{{ item.name }}</h4>
+            </md-list-item>
+        </md-list>
+    </div>
+    <div flex="">
+        <div flex="" class="chat">
+            <md-card>
+                <md-content style="height: 500px;">
+                    <section>
+                        <md-list>
+                            <md-list-item class="md-1-line" ng-repeat="item in usersMessages">
+                                {item.text}
+                                <div flex="" id="messages" layout="column">
+                            </md-list-item>
+                        </md-list>
+                    </section>
+                </md-content>
+                <md-input-container>
+                    <label>You Massage</label>
+                    <input ng-model="text">
+                </md-input-container>
+                <md-button class="md-raised md-primary" ng-click="sendMessage(text)">Send</md-button>
+
+            </md-card>
+        </div>
+    </div>
+</div>
+</div>
