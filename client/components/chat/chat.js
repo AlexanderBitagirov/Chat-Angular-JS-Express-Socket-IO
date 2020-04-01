@@ -1,6 +1,7 @@
 function chatController($scope, AppService, $compile) {
     let socket = io.connect();
     let viewSendMess = angular.element(document.getElementById("messages"))
+
     let chats = new Map()
     $scope.user = AppService.get("Auth")
 
@@ -17,9 +18,12 @@ function chatController($scope, AppService, $compile) {
     // получаем id юзера
 
     $scope.receiveIdUser = (id, name) => {
+        viewSendMess.empty()
+        angular.element(document.getElementsByClassName("chat")).css("display", "block")
         AppService.save("place", name)
         $scope.userID = id
         $scope.toSend = name
+
 
         let data = {
             from: $scope.user,
@@ -35,7 +39,7 @@ function chatController($scope, AppService, $compile) {
         if (chats.has($scope.chatId)) {
             let mess = chats.get($scope.chatId)
             $scope.usersMessages = mess.message
-            console.log( $scope.usersMessages)
+            console.log($scope.usersMessages)
             mess.message.forEach(element => {
                 if (element.userName === $scope.user) {
                     angular.element(
@@ -65,7 +69,6 @@ function chatController($scope, AppService, $compile) {
         } else {
             console.log("Сообщений пока нет")
         }
-
 
     }
 
@@ -115,9 +118,9 @@ function chatController($scope, AppService, $compile) {
         } else {
             chats.set(data.id, data)
         }
-
+        console.log(chats)
         // рендерим входящее сообщение
-        if ($scope.user !== mess.userName) {
+        if (AppService.get("place") === mess.userName) {
             angular.element(
                 viewSendMess.append(
                     $compile(

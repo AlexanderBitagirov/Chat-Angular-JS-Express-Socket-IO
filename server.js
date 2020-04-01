@@ -9,27 +9,31 @@ const {
 
 let usersOnline = [];
 let chats = [];
+
+
 app.use(express.static(__dirname + "/dist/"));
+
 
 io.on("connection", function (socket) {
     socket.on("login", function (data) {
-        console.log(data)
         let user = {
             id: socket.id,
             name: data.user
         }
         usersOnline.push(user)
-        console.log(usersOnline)
         io.emit("login",
             usersOnline
         )
     })
 
     socket.on("create chat", function (data) {
+
         let chat;
         chats.forEach(e => {
             let userSearch = e.users.filter(u => u === data.from || data.to)
-            if (userSearch.length === 2) {
+
+
+            if (userSearch.find(e => e === data.to) && userSearch.find(e => e === data.from)) {
                 chat = e
             }
         })
@@ -42,7 +46,7 @@ io.on("connection", function (socket) {
             chats.push(chat)
         }
         io.to(data.toID).to(socket.id).emit("create chat", chat);
-
+        console.log("chats", chats)
     })
 
     socket.on("send message", function (data) {
@@ -56,16 +60,11 @@ io.on("connection", function (socket) {
             if (e.id === data.chatId) {
                 let a = e
                 a.message.push(message)
-                io.to(data.id).to(socket.id).emit("send message", a , message);
+                io.to(data.id).to(socket.id).emit("send message", a, message);
             }
         })
 
         console.log("chat", chats)
-
-        // io.to(data.id).emit("send message", {
-        //     message: data.text,
-        //     from: data.from
-        // });
     })
 })
 

@@ -85772,24 +85772,6 @@ MyApp = angular.module("MyApp", [
     "ngAria",
     "ui.router"
   ]);
-MyApp.factory("AppService", function($state) {
-    return {
-      exit: () => {
-        localStorage.removeItem("auth");
-        $state.go("login");
-      },
-  
-      get: item => {
-        const listLocalStotage = localStorage.getItem(item);
-        if (listLocalStotage !== null) {
-          return JSON.parse(listLocalStotage);
-        }
-      },
-      save: (item, object) => {
-        localStorage.setItem(item, JSON.stringify(object));
-      }
-    };
-  });
 MyApp.config(function($stateProvider, $urlRouterProvider) {
     let loginState = {
       name: "login",
@@ -85809,23 +85791,28 @@ MyApp.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise("/login");
   });
   
-function loginController($scope, $state, AppService) {
-
-    $scope.login = (user) => {
-        let a = user
-        AppService.save("Auth", a)
-        $state.go("chat")
-    }
-}
-
-
-angular.module("MyApp").component("login", {
-    controller: loginController,
-    templateUrl: "./components/login/login.html"
-});
+MyApp.factory("AppService", function($state) {
+    return {
+      exit: () => {
+        localStorage.removeItem("auth");
+        $state.go("login");
+      },
+  
+      get: item => {
+        const listLocalStotage = localStorage.getItem(item);
+        if (listLocalStotage !== null) {
+          return JSON.parse(listLocalStotage);
+        }
+      },
+      save: (item, object) => {
+        localStorage.setItem(item, JSON.stringify(object));
+      }
+    };
+  });
 function chatController($scope, AppService, $compile) {
     let socket = io.connect();
     let viewSendMess = angular.element(document.getElementById("messages"))
+
     let chats = new Map()
     $scope.user = AppService.get("Auth")
 
@@ -85842,9 +85829,12 @@ function chatController($scope, AppService, $compile) {
     // получаем id юзера
 
     $scope.receiveIdUser = (id, name) => {
+        viewSendMess.empty()
+        angular.element(document.getElementsByClassName("chat")).css("display", "block")
         AppService.save("place", name)
         $scope.userID = id
         $scope.toSend = name
+
 
         let data = {
             from: $scope.user,
@@ -85860,37 +85850,36 @@ function chatController($scope, AppService, $compile) {
         if (chats.has($scope.chatId)) {
             let mess = chats.get($scope.chatId)
             $scope.usersMessages = mess.message
-            console.log( $scope.usersMessages)
-            // mess.message.forEach(element => {
-            //     if (element.userName === $scope.user) {
-            //         angular.element(
-            //             viewSendMess.append(
-            //                 $compile(
-            //                     `<div flex='' layout='row' class='out' layout-align='end start'> 
-            //                       ${element.text} 
-            //                 </div>`
-            //                 )($scope)
-            //             )
-            //         );
-            //     } else {
-            //         angular.element(
-            //             viewSendMess.append(
-            //                 $compile(
-            //                     `<div flex='' layout='row' class='income' layout-align='start start'><b> 
-            //                               ${element.userName} 
-            //                               </b><br> 
-            //                               ${element.text} 
-            //                               </div>`
-            //                 )($scope)
-            //             )
-            //         );
-            //     }
-            // });
+            console.log($scope.usersMessages)
+            mess.message.forEach(element => {
+                if (element.userName === $scope.user) {
+                    angular.element(
+                        viewSendMess.append(
+                            $compile(
+                                `<div flex='' layout='row' class='out' layout-align='end start'> 
+                                  ${element.text} 
+                            </div>`
+                            )($scope)
+                        )
+                    );
+                } else {
+                    angular.element(
+                        viewSendMess.append(
+                            $compile(
+                                `<div flex='' layout='row' class='income' layout-align='start start'><b> 
+                                          ${element.userName} 
+                                          </b><br> 
+                                          ${element.text} 
+                                          </div>`
+                            )($scope)
+                        )
+                    );
+                }
+            });
 
         } else {
             console.log("Сообщений пока нет")
         }
-
 
     }
 
@@ -85940,9 +85929,9 @@ function chatController($scope, AppService, $compile) {
         } else {
             chats.set(data.id, data)
         }
-
+        console.log(chats)
         // рендерим входящее сообщение
-        if ($scope.user !== mess.userName) {
+        if (AppService.get("place") === mess.userName) {
             angular.element(
                 viewSendMess.append(
                     $compile(
@@ -85962,4 +85951,18 @@ function chatController($scope, AppService, $compile) {
 angular.module("MyApp").component("chat", {
     controller: chatController,
     templateUrl: "./components/chat/chat.html"
+});
+function loginController($scope, $state, AppService) {
+
+    $scope.login = (user) => {
+        let a = user
+        AppService.save("Auth", a)
+        $state.go("chat")
+    }
+}
+
+
+angular.module("MyApp").component("login", {
+    controller: loginController,
+    templateUrl: "./components/login/login.html"
 });
