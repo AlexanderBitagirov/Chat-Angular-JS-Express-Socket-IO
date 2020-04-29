@@ -15,6 +15,17 @@ app.use(express.static(__dirname + "/dist/"));
 
 
 io.on("connection", function (socket) {
+
+    // socket.on("disconnect", function (data) {
+    //     usersOnline.forEach(e => {
+    //         if (e.id = socket) {
+    //             usersOnline.splice(e, 1)
+    //         }
+    //     })
+
+    //     console.log(usersOnline)
+    // })
+
     socket.on("login", function (data) {
         let user = {
             id: socket.id,

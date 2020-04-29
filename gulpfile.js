@@ -33,7 +33,6 @@ gulp.task("css", function () {
         .src(styles)
         .pipe(concat("style.css"))
         .pipe(gulp.dest("./dist/css"))
-        .pipe(browserSync.stream());
 });
 
 gulp.task("scripts", function () {
@@ -41,14 +40,12 @@ gulp.task("scripts", function () {
         .src(scripts)
         .pipe(concat("script.js"))
         .pipe(gulp.dest("./dist/js"))
-        .pipe(browserSync.stream());
 });
 
 gulp.task("html", function () {
     return gulp
         .src(template)
         .pipe(gulp.dest("./dist"))
-        .pipe(browserSync.stream());
 });
 
 gulp.task("serve", function () {
